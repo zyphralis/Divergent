@@ -2,52 +2,42 @@
 
 Divergent is an application for creating and managing Discord bots with a clean, minimal, Nothing-inspired design.
 
-## What this repository now includes
+## What this repository includes
 
-This project contains a functional multi-step web prototype of the Divergent experience:
+A runnable full-stack prototype of the Divergent flow:
 
-- Token verification flow with actionable Developer Portal guidance.
-- Setup-path selection (templates vs custom).
-- Template catalog (moderation, welcome, utility, and event bots).
-- Live dashboard preview with sandbox and one-click deploy actions.
+- Bot token verification via API.
+- Setup path selection (templates or custom).
+- Template catalog (moderation, welcome, utility, event).
+- Live dashboard data from server state.
+- Sandbox test and one-click deploy actions.
 
 ## Run locally
 
-From the project root, start a static server:
-
 ```bash
-python3 -m http.server 4173
+npm start
 ```
 
 Then open `http://localhost:4173`.
 
+## Available scripts
+
+```bash
+npm run check
+npm start
+```
+
 ## Product flow
 
-### 1) Verify your bot token
-
-Paste your bot token on the first screen. Divergent verifies token shape quickly and checks for likely permission/access issues. If verification fails, the app points you directly to clear Developer Portal steps.
-
-### 2) Choose your path
-
-After verification, you can continue with:
-
-- **Templates** for instant setup.
-- **Custom setup** to shape behavior, roles, and command structure for your server.
-
-### 3) Use templates that match real server needs
-
-The moderation template includes command coverage for kick, ban, timeout, warn, and message purge. It also emphasizes hierarchy checks, risk warnings, moderation logs, and scale-friendly controls like rate limits and appeals.
-
-Additional templates cover welcome/onboarding, utility tooling, and event workflows.
-
-### 4) Operate from one dashboard
-
-A live dashboard surfaces bot status, latency, command usage, and errors. You can run sandbox tests before deploying updates in one click.
+1. Verify token on the first screen.
+2. Choose setup path.
+3. Select a template to initialize bot configuration.
+4. Use the dashboard to run sandbox tests and deploy updates.
 
 ## Design principles
 
 - Monochrome visuals with soft-dot texture.
-- Generous spacing and single-task screens.
+- Generous spacing and focused single-task panels.
 - No clutter and no hidden menus.
 
 Divergent removes friction while keeping control in your hands.

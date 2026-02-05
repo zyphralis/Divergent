@@ -1,31 +1,3 @@
-const templates = [
-  {
-    id: 'moderation',
-    title: 'Moderation bot',
-    description:
-      'Slash commands for kick, ban, timeout, warn, and purge with hierarchy checks and safety limits.',
-    details: 'Includes risk warnings, private logs, and options for appeal buttons + rate limits.'
-  },
-  {
-    id: 'welcome',
-    title: 'Welcome bot',
-    description: 'Branded greetings, auto-role assignment, and join/leave tracking.',
-    details: 'Great for community onboarding and clean channel structure.'
-  },
-  {
-    id: 'utility',
-    title: 'Utility bot',
-    description: 'Polls, reminders, quick timestamps, and daily helper commands.',
-    details: 'General-purpose tools for productivity and coordination.'
-  },
-  {
-    id: 'events',
-    title: 'Event bot',
-    description: 'Countdowns, schedules, signups, and announcement automation.',
-    details: 'Useful for launches, tournaments, and recurring server events.'
-  }
-];
-
 const verifyBtn = document.getElementById('verify-btn');
 const tokenInput = document.getElementById('token-input');
 const verifyStatus = document.getElementById('verify-status');
@@ -45,37 +17,33 @@ const sandboxBtn = document.getElementById('sandbox-btn');
 const deployBtn = document.getElementById('deploy-btn');
 const actionLog = document.getElementById('action-log');
 
-let selectedTemplate = '';
+let templatesCache = [];
 
-function fakeVerifyToken(token) {
-  const trimmed = token.trim();
-  if (!trimmed) {
-    return { ok: false, reason: 'Paste a token before verification.' };
+async function request(url, options = {}) {
+  const response = await fetch(url, {
+    headers: { 'Content-Type': 'application/json' },
+    ...options
+  });
+  const payload = await response.json();
+  if (!response.ok) {
+    throw new Error(payload.reason || payload.message || payload.error || 'Request failed.');
   }
-
-  const looksLikeToken = trimmed.length > 30 && trimmed.includes('.');
-  if (!looksLikeToken) {
-    return {
-      ok: false,
-      reason: 'Token format looks wrong. Open Developer Portal → Bot and copy token again.'
-    };
-  }
-
-  if (trimmed.toLowerCase().includes('deny') || trimmed.toLowerCase().includes('fail')) {
-    return {
-      ok: false,
-      reason: 'Missing permissions detected. Re-invite the bot with Manage Messages and Moderate Members.'
-    };
-  }
-
-  return { ok: true };
+  return payload;
 }
 
 function showPanel(panel) {
   panel.classList.remove('hidden');
 }
 
-function renderTemplates() {
+function paintDashboard(state) {
+  metricStatus.textContent = state.status;
+  metricLatency.textContent = state.latency == null ? '-- ms' : `${state.latency} ms`;
+  metricCommands.textContent = `${state.commands1h}`;
+  metricErrors.textContent = `${state.errors1h}`;
+  actionLog.textContent = state.lastAction;
+}
+
+function renderTemplates(templates) {
   templateList.innerHTML = '';
 
   templates.forEach((template) => {
@@ -89,42 +57,49 @@ function renderTemplates() {
       <p>${template.details}</p>
     `;
 
-    button.addEventListener('click', () => {
-      selectedTemplate = template.id;
-      for (const sibling of templateList.querySelectorAll('.card')) {
-        sibling.classList.remove('selected');
+    button.addEventListener('click', async () => {
+      try {
+        for (const sibling of templateList.querySelectorAll('.card')) {
+          sibling.classList.remove('selected');
+        }
+        button.classList.add('selected');
+
+        const result = await request('/api/select-template', {
+          method: 'POST',
+          body: JSON.stringify({ templateId: template.id })
+        });
+
+        showPanel(dashboardPanel);
+        paintDashboard(result.state);
+      } catch (error) {
+        actionLog.textContent = error.message;
       }
-      button.classList.add('selected');
-      showPanel(dashboardPanel);
-      metricStatus.textContent = 'Online';
-      metricLatency.textContent = `${Math.floor(Math.random() * 40 + 45)} ms`;
-      metricCommands.textContent = `${Math.floor(Math.random() * 250 + 50)}`;
-      metricErrors.textContent = `${Math.floor(Math.random() * 3)}`;
-      actionLog.textContent = `${template.title} configured. Sandbox ready.`;
     });
 
     templateList.appendChild(button);
   });
 }
 
-verifyBtn.addEventListener('click', () => {
-  const result = fakeVerifyToken(tokenInput.value);
-
+verifyBtn.addEventListener('click', async () => {
   verifyStatus.classList.remove('ok', 'warn');
 
-  if (!result.ok) {
-    verifyStatus.classList.add('warn');
-    verifyStatus.textContent = result.reason;
-    developerHelp.open = true;
-    return;
-  }
+  try {
+    const result = await request('/api/verify', {
+      method: 'POST',
+      body: JSON.stringify({ token: tokenInput.value })
+    });
 
-  verifyStatus.classList.add('ok');
-  verifyStatus.textContent = 'Verification complete. Permissions and server access look good.';
-  showPanel(pathPanel);
+    verifyStatus.classList.add('ok');
+    verifyStatus.textContent = result.message;
+    showPanel(pathPanel);
+  } catch (error) {
+    verifyStatus.classList.add('warn');
+    verifyStatus.textContent = error.message;
+    developerHelp.open = true;
+  }
 });
 
-setupOptions.addEventListener('click', (event) => {
+setupOptions.addEventListener('click', async (event) => {
   const selected = event.target.closest('[data-path]');
   if (!selected) {
     return;
@@ -133,28 +108,46 @@ setupOptions.addEventListener('click', (event) => {
   for (const sibling of setupOptions.querySelectorAll('.card')) {
     sibling.classList.remove('selected');
   }
-
   selected.classList.add('selected');
+
   showPanel(templatesPanel);
-  renderTemplates();
-});
 
-sandboxBtn.addEventListener('click', () => {
-  if (!selectedTemplate) {
-    actionLog.textContent = 'Choose a template before running sandbox tests.';
-    return;
+  if (templatesCache.length === 0) {
+    try {
+      const result = await request('/api/templates');
+      templatesCache = result.templates;
+    } catch (error) {
+      actionLog.textContent = error.message;
+      return;
+    }
   }
 
-  actionLog.textContent = 'Sandbox test passed. Commands responded in isolated server environment.';
-  metricErrors.textContent = '0';
+  renderTemplates(templatesCache);
 });
 
-deployBtn.addEventListener('click', () => {
-  if (!selectedTemplate) {
-    actionLog.textContent = 'Select a template first, then deploy in one click.';
-    return;
+sandboxBtn.addEventListener('click', async () => {
+  try {
+    const result = await request('/api/sandbox-test', { method: 'POST', body: '{}' });
+    paintDashboard(result.state);
+  } catch (error) {
+    actionLog.textContent = error.message;
   }
-
-  actionLog.textContent = 'Deployment complete. Your updated bot configuration is now live.';
-  metricStatus.textContent = 'Online';
 });
+
+deployBtn.addEventListener('click', async () => {
+  try {
+    const result = await request('/api/deploy', { method: 'POST', body: '{}' });
+    paintDashboard(result.state);
+  } catch (error) {
+    actionLog.textContent = error.message;
+  }
+});
+
+(async () => {
+  try {
+    const result = await request('/api/dashboard');
+    paintDashboard(result.state);
+  } catch {
+    // Keep default fallback UI values.
+  }
+})();
