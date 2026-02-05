@@ -2,48 +2,52 @@
 
 Divergent is an application for creating and managing Discord bots with a clean, minimal, Nothing-inspired design.
 
-## How it starts
+## What this repository now includes
 
-Paste your bot token on the first screen and Divergent verifies it in seconds. The app checks your bot’s permissions and server access. If something fails, Divergent shows precise steps inside the Discord Developer Portal with clear clicks and toggles—no technical jargon.
+This project contains a functional multi-step web prototype of the Divergent experience:
 
-## Build path after verification
+- Token verification flow with actionable Developer Portal guidance.
+- Setup-path selection (templates vs custom).
+- Template catalog (moderation, welcome, utility, and event bots).
+- Live dashboard preview with sandbox and one-click deploy actions.
 
-After verification, you can choose one of two paths:
+## Run locally
 
-- **Templates** to build a working bot instantly.
-- **Custom setup** to shape commands, behavior, and roles around your server.
+From the project root, start a static server:
 
-## Moderation template
+```bash
+python3 -m http.server 4173
+```
 
-The moderation template includes slash commands for:
+Then open `http://localhost:4173`.
 
-- Kick
-- Ban
-- Timeout
-- Warn
-- Message purge
+## Product flow
 
-You can set role hierarchy and safety limits, receive automatic moderation logs in a private channel, and get warned about risky actions before they run. For larger servers, you can enable rate limits and appeal buttons.
+### 1) Verify your bot token
 
-## Other templates
+Paste your bot token on the first screen. Divergent verifies token shape quickly and checks for likely permission/access issues. If verification fails, the app points you directly to clear Developer Portal steps.
 
-Divergent also includes templates for common needs:
+### 2) Choose your path
 
-- **Welcome bot**: sends branded greetings, assigns roles, and tracks joins.
-- **Utility bot**: adds polls, reminders, and timestamp tools.
-- **Event bot**: handles countdowns, schedules, and announcements.
+After verification, you can continue with:
 
-## Dashboard and deployment
+- **Templates** for instant setup.
+- **Custom setup** to shape behavior, roles, and command structure for your server.
 
-A live dashboard shows your bot status, latency, command usage, and errors. You can test commands in a sandbox server before deployment, then push updates with one click.
+### 3) Use templates that match real server needs
 
-Divergent keeps everything in one place.
+The moderation template includes command coverage for kick, ban, timeout, warn, and message purge. It also emphasizes hierarchy checks, risk warnings, moderation logs, and scale-friendly controls like rate limits and appeals.
+
+Additional templates cover welcome/onboarding, utility tooling, and event workflows.
+
+### 4) Operate from one dashboard
+
+A live dashboard surfaces bot status, latency, command usage, and errors. You can run sandbox tests before deploying updates in one click.
 
 ## Design principles
 
-The interface uses monochrome tones, soft dots, and generous spacing. Each screen focuses on one task:
+- Monochrome visuals with soft-dot texture.
+- Generous spacing and single-task screens.
+- No clutter and no hidden menus.
 
-- No clutter
-- No hidden menus
-
-Divergent removes friction and keeps control in your hands.
+Divergent removes friction while keeping control in your hands.
