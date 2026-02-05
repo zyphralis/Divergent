@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Divergent</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="grain"></div>
+    <main class="app-shell">
+      <header class="topbar">
+        <div class="brand">
+          <span class="dot"></span>
+          <h1>Divergent</h1>
+        </div>
+        <p class="tagline">Create and manage Discord bots without friction.</p>
+      </header>
+
+      <section class="panel" id="onboarding-panel">
+        <h2>1. Verify your bot token</h2>
+        <p>
+          Paste your token. Divergent validates access, permissions, and server visibility in seconds.
+        </p>
+        <label for="token-input">Bot token</label>
+        <div class="token-row">
+          <input id="token-input" placeholder="Paste Discord bot token" autocomplete="off" />
+          <button id="verify-btn">Verify</button>
+        </div>
+
+        <div class="status" id="verify-status" aria-live="polite">
+          Waiting for token verification.
+        </div>
+
+        <details id="developer-help">
+          <summary>Need help in Discord Developer Portal?</summary>
+          <ol>
+            <li>Open your bot in <strong>Discord Developer Portal</strong>.</li>
+            <li>Go to <strong>Bot → Privileged Gateway Intents</strong>.</li>
+            <li>Enable required toggles and save changes.</li>
+            <li>Re-invite your bot to the server with updated permissions.</li>
+          </ol>
+        </details>
+      </section>
+
+      <section class="panel hidden" id="path-panel">
+        <h2>2. Choose your setup path</h2>
+        <div class="cards two-col" id="setup-options">
+          <button class="card selectable" data-path="templates">
+            <h3>Templates</h3>
+            <p>Launch a working bot instantly with pre-built command sets.</p>
+          </button>
+          <button class="card selectable" data-path="custom">
+            <h3>Custom setup</h3>
+            <p>Define behavior, roles, and commands around your own server rules.</p>
+          </button>
+        </div>
+      </section>
+
+      <section class="panel hidden" id="templates-panel">
+        <h2>3. Pick a template</h2>
+        <div class="cards" id="template-list"></div>
+      </section>
+
+      <section class="panel hidden" id="dashboard-panel">
+        <h2>Live dashboard</h2>
+        <div class="metrics">
+          <article>
+            <span>Status</span>
+            <strong id="metric-status">Offline</strong>
+          </article>
+          <article>
+            <span>Latency</span>
+            <strong id="metric-latency">-- ms</strong>
+          </article>
+          <article>
+            <span>Commands (1h)</span>
+            <strong id="metric-commands">0</strong>
+          </article>
+          <article>
+            <span>Errors (1h)</span>
+            <strong id="metric-errors">0</strong>
+          </article>
+        </div>
+
+        <div class="actions">
+          <button id="sandbox-btn" class="ghost">Run sandbox test</button>
+          <button id="deploy-btn">One-click deploy</button>
+        </div>
+
+        <p class="log" id="action-log">No actions yet.</p>
+      </section>
+    </main>
+
+    <script src="app.js"></script>
+  </body>
+</html>
